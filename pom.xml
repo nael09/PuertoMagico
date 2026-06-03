@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.puertomagico</groupId>
+    <artifactId>puertomagico</artifactId>
+    <version>1.0</version>
+    <packaging>war</packaging>
+    <name>Puerto Magico - Agencia de Viajes Turisticos</name>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+
+        <!--
+            Servlet API para Tomcat 9.
+            scope=provided significa que Tomcat ya la incluye
+            y no necesitamos empaquetarla en el WAR.
+        -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--
+            JSTL — JavaServer Pages Standard Tag Library.
+            Permite usar etiquetas como <c:forEach>, <c:if>
+            en los archivos JSP en lugar de scriplets Java.
+            Requerido por el documento del proyecto.
+        -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+        </dependency>
+
+        <!--
+            Driver JDBC de PostgreSQL.
+            Permite que Java se conecte a la base de datos.
+        -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.6.0</version>
+        </dependency>
+
+        <!--
+            Gson — convierte objetos Java a JSON y viceversa.
+            Lo usan los Servlets para responder en formato JSON.
+        -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+
+            <!--
+                Plugin WAR — empaqueta el proyecto como
+                archivo .war para desplegarlo en Tomcat.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.3.2</version>
+            </plugin>
+
+            <!--
+                Tomcat 7 Maven Plugin — Tomcat EMBEBIDO via Maven.
+                Permite ejecutar la aplicacion con:
+                mvn tomcat7:run
+                Sin necesidad de tener Tomcat instalado externamente.
+                Requerido por el documento del proyecto.
+            -->
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <!--
+                        Puerto donde correra la aplicacion.
+                        Acceso: http://localhost:8080/PuertoMagico
+                    -->
+                    <port>8080</port>
+                    <!-- Ruta de contexto de la aplicacion -->
+                    <path>/PuertoMagico</path>
+                    <!-- Codificacion de caracteres UTF-8 -->
+                    <uriEncoding>UTF-8</uriEncoding>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>
