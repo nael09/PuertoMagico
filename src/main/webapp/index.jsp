@@ -1,4 +1,7 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%-- Directivas al inicio — SIEMPRE deben ir aqui --%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="true" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -402,16 +405,6 @@
     
     
     <!-- ── FOOTER ────────────────────────────────────────── -->
-<%-- 
-    Importamos la libreria JSTL Core con el prefijo "c".
-    Esto nos permite usar etiquetas como:
-    <c:if>, <c:forEach>, <c:out>, <c:set>
-    en lugar de escribir Java directamente en el JSP.
---%>
-
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-
 <%-- 
     Guardamos el año actual en una variable JSTL
     para mostrarlo dinamicamente en el footer.

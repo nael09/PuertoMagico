@@ -16,11 +16,26 @@ public class ConexionDB {
      
      */
     public static Connection getConexion() throws SQLException {
-        // DriverManager es la clase de Java que maneja los drivers de BD
-        // Le pasamos la URL, usuario y contraseña
-        Connection conexion = DriverManager.getConnection(URL, USUARIO, PASSWORD);
-        return conexion;
+
+    try {
+        /*
+         * Class.forName() carga explícitamente el driver de PostgreSQL.
+         * Con Tomcat externo no es necesario porque Tomcat lo registra
+         * automáticamente, pero con el Tomcat embebido de Maven
+         * hay que cargarlo manualmente o lanza:
+         * "No suitable driver found"
+         */
+        Class.forName("org.postgresql.Driver");
+
+    } catch (ClassNotFoundException e) {
+        System.err.println("Driver PostgreSQL no encontrado: "
+            + e.getMessage());
     }
+
+    Connection conexion = DriverManager.getConnection(
+        URL, USUARIO, PASSWORD);
+    return conexion;
+}
 
     public static void cerrarConexion(Connection conexion) {
         if (conexion != null) {

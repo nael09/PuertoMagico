@@ -124,9 +124,14 @@ public class UsuarioDAO {
 
         Connection conexion = null;
         Usuario usuario = null;
-
+        
+        // .trim() elimina espacios al inicio y final del email
+    // Evita fallos de login por espacios accidentales
+        String emailLimpio  = email.trim();
         // Encriptamos la contraseña para compararla con la BD
         String passwordHash = encriptarMD5(password);
+
+        
 
         // Buscamos un usuario que tenga ESE email Y ESE hash
         // Si ambos coinciden, el login es correcto
@@ -134,7 +139,7 @@ public class UsuarioDAO {
                      "password_hash, telefono, rol, created_at " +
                      "FROM usuarios " +
                      "WHERE email = ? AND password_hash = ?";
-
+        
         try {
             conexion = ConexionDB.getConexion();
             PreparedStatement stmt = conexion.prepareStatement(sql);
