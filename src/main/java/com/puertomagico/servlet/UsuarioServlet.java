@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -103,7 +104,14 @@ public class UsuarioServlet extends HttpServlet {
         if ("/logout".equals(pathInfo)) {
             // ── LOGOUT ────────────────────────────────────
             manejarLogout(request, response, out);
+            
+            
+            } else if ("/listar".equals(pathInfo)) {
+          // Solo ADMIN puede ver todos los usuarios
+            manejarListarUsuarios(request, response, out);
 
+            
+            
         } else if ("/sesion".equals(pathInfo)) {
             // ── VERIFICAR SESIÓN ──────────────────────────
             manejarVerificarSesion(request, response, out);
@@ -425,4 +433,34 @@ public class UsuarioServlet extends HttpServlet {
         respuesta.put("mensaje", mensaje);
         return respuesta;
     }
-}
+
+    private void manejarListarUsuarios(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
+        
+    // Verificar que sea ADMIN
+    HttpSession sesion = request.getSession(false);
+    if (sesion == null ||
+        !"ADMIN".equals(sesion.getAttribute("rol"))) {
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        out.print(gson.toJson(crearError("Acceso denegado")));
+        return;
+    }
+
+    try {
+        List<com.puertomagico.modelo.Usuario> usuarios =
+            usuarioDAO.listarTodos();
+        out.print(gson.toJson(usuarios));
+
+    } catch (Exception e) {
+        response.setStatus(
+            HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        out.print(gson.toJson(
+            crearError("Error: " + e.getMessage())));
+    }
+}    
+    
+    
+    
+   
+    
+    
+} 

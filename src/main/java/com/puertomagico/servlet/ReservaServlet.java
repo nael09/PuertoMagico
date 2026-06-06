@@ -49,7 +49,7 @@ public class ReservaServlet extends HttpServlet {
 
         GsonBuilder builder = new GsonBuilder();
 
-        builder.registerTypeAdapter(LocalDateTime.class,
+        builder.registerTypeAdapter(java.time.LocalDateTime.class,
             (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context) ->
                 context.serialize(src.format(
                     DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
@@ -68,10 +68,7 @@ public class ReservaServlet extends HttpServlet {
                          HttpServletResponse response)
             throws ServletException, IOException {
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.setHeader("Access-Control-Allow-Origin", "*");
-
+        configurarRespuesta(response);
         PrintWriter out = response.getWriter();
 
         // Verificamos que el usuario esté logueado
@@ -79,11 +76,20 @@ public class ReservaServlet extends HttpServlet {
         if (!verificarSesion(request, response, out)) return;
 
         String pathInfo = request.getPathInfo();
+        
+        HttpSession sesion = request.getSession(false);
+        String rol = (String) sesion.getAttribute("rol");
 
         if ("/mis-reservas".equals(pathInfo)) {
-            // Reservas del cliente logueado
-            manejarMisReservas(request, response, out);
-
+            // Si es ADMIN devuelve TODAS las reservas
+            // Si es CLIENTE devuelve solo las suyas
+            if("ADMIN".equals(rol)){
+                manejarTodasLasReservas(request, response , out);
+            } else {
+                // Reservas del cliente logueado
+                 manejarMisReservas(request, response, out);
+            }
+            
         } else {
             // Detalle de una reserva por ID
             // URL: GET /api/reservas?id=5
@@ -442,4 +448,43 @@ public class ReservaServlet extends HttpServlet {
         ok.put("mensaje", mensaje);
         return ok;
     }
+/*
+    
+  /**
+ * manejarTodasLasReservas()
+ *
+ * Solo accesible por el ADMIN.
+ * Devuelve todas las reservas del sistema
+ * para mostrarlas en el panel de administracion.
+ */
+    private void manejarTodasLasReservas(HttpServletRequest request,
+                                      HttpServletResponse response,
+                                      PrintWriter out) {
+      try {
+        List<Reserva> reservas = reservaDAO.listarTodas();
+        out.print(gson.toJson(reservas));
+
+    } catch (Exception e) {
+        response.setStatus(
+            HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        out.print(gson.toJson(
+            crearError("Error al obtener reservas: "
+                + e.getMessage())));
+    }
+      
+  }      
+
+   /**
+ * configurarRespuesta()
+ * Configura los headers de la respuesta HTTP.
+ * Se llama al inicio de cada doGet, doPost, etc.
+ * para que el navegador sepa que la respuesta es JSON.
+ */
+  private void configurarRespuesta(HttpServletResponse response) {
+    response.setContentType("application/json");
+    response.setCharacterEncoding("UTF-8");
+    response.setHeader("Access-Control-Allow-Origin", "*");
+  }
+  
+  
 }

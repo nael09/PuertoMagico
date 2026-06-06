@@ -503,7 +503,23 @@
                 document.getElementById('s-reservas')
                     .textContent = 'Error';
             });
+            
+            
+            
+           
+        fetch(BASE + '/api/usuarios/listar')
+             .then(function(r) { return r.json(); })
+             .then(function(usuarios) {
+              document.getElementById('s-usuarios').textContent =
+            Array.isArray(usuarios) ? usuarios.length : 0;
+            })
+             .catch(function() {
+                document.getElementById('s-usuarios')
+            .textContent = 'Error';
+             });
+            
     }
+    
 
     // ── TOURS ──────────────────────────────────────────────
 
@@ -754,27 +770,56 @@
 
     // ── USUARIOS ───────────────────────────────────────────
 
-    function cargarUsuarios() {
-        fetch(BASE + '/api/usuarios/sesion')
-            .then(function(r) { return r.json(); })
-            .then(function(d) {
-                document.getElementById('tb-usuarios').innerHTML =
+     function cargarUsuarios() {
+       var tb = document.getElementById('tb-usuarios');
+       tb.innerHTML = '<tr><td colspan="6"' +
+        ' class="text-center py-3 text-muted">' +
+        'Cargando...</td></tr>';
+
+    // Ahora llama al endpoint que lista TODOS los usuarios
+       fetch(BASE + '/api/usuarios/listar')
+        .then(function(r) { return r.json(); })
+        .then(function(usuarios) {
+
+            if (!Array.isArray(usuarios) ||
+                usuarios.length === 0) {
+                tb.innerHTML = '<tr><td colspan="6"' +
+                    ' class="text-center py-3 text-muted">' +
+                    'Sin usuarios.</td></tr>';
+                return;
+            }
+
+            var html = '';
+            usuarios.forEach(function(u) {
+                var badge = u.rol === 'ADMIN'
+                    ? 'bg-danger'
+                    : 'bg-primary';
+
+                // Formatear la fecha de registro
+                var fecha = u.createdAt
+                    ? u.createdAt.substring(0, 10)
+                    : '-';
+
+                html +=
                     '<tr>' +
-                    '<td>' + (d.usuarioId || '-') + '</td>' +
-                    '<td>' + (d.nombre || '-') + '</td>' +
-                    '<td>' + (d.email || '-') + '</td>' +
-                    '<td>-</td>' +
-                    '<td><span class="badge bg-warning text-dark">' +
-                    (d.rol || '-') + '</span></td>' +
-                    '<td>-</td></tr>';
-            })
-            .catch(function() {
-                document.getElementById('tb-usuarios').innerHTML =
-                    '<tr><td colspan="6"' +
-                    ' class="text-center py-3 text-danger">' +
-                    'Error al cargar.</td></tr>';
+                    '<td>' + u.id + '</td>' +
+                    '<td>' + u.nombre + ' ' + u.apellido + '</td>' +
+                    '<td>' + u.email + '</td>' +
+                    '<td>' + (u.telefono || '-') + '</td>' +
+                    '<td><span class="badge ' + badge + '">' +
+                    u.rol + '</span></td>' +
+                    '<td>' + fecha + '</td>' +
+                    '</tr>';
             });
-    }
+
+            tb.innerHTML = html;
+        })
+        .catch(function() {
+            tb.innerHTML = '<tr><td colspan="6"' +
+                ' class="text-center py-3 text-danger">' +
+                'Error al cargar usuarios.</td></tr>';
+        });
+}
 
     // ── UTILIDAD ───────────────────────────────────────────
 
