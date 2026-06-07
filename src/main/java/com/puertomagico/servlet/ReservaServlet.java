@@ -172,7 +172,7 @@ public class ReservaServlet extends HttpServlet {
                 return;
             }
 
-            Integer id     = Integer.parseInt(paramId);
+            Integer id = Integer.parseInt(paramId);
             Reserva reserva = reservaDAO.buscarPorId(id);
 
             if (reserva == null) {
@@ -225,101 +225,76 @@ public class ReservaServlet extends HttpServlet {
      * }
      */
     private void manejarCrear(HttpServletRequest request,
-                               HttpServletResponse response,
-                               PrintWriter out) {
-        try {
-            // Leer el JSON del cuerpo de la petición
-            StringBuilder sb = new StringBuilder();
-            String linea;
-            while ((linea = request.getReader().readLine()) != null) {
-                sb.append(linea);
-            }
-
-            // Convertimos el JSON a un Map para leer cada campo
-            @SuppressWarnings("unchecked")
-            Map<String, Object> datos = gson.fromJson(
-                sb.toString(), Map.class);
-
-            // ── Validaciones básicas ───────────────────────
-            if (datos.get("tipoServicio") == null ||
-                datos.get("fechaViaje")   == null ||
-                datos.get("personas")     == null ||
-                datos.get("total")        == null) {
-
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.print(gson.toJson(
-                    crearError("Faltan datos obligatorios")));
-                return;
-            }
-
-            // ── Construir objeto Reserva ───────────────────
-            Reserva reserva = new Reserva();
-
-            // Asignamos el usuario desde la sesión
-            // El cliente no puede reservar a nombre de otro
-            HttpSession sesion = request.getSession(false);
-            reserva.setUsuarioId((Integer) sesion.getAttribute("usuarioId"));
-
-            reserva.setTipoServicio((String) datos.get("tipoServicio"));
-
-            // tourId o paqueteId según el tipo de servicio
-            if ("TOUR".equals(reserva.getTipoServicio())) {
-                Integer tourId = ((Double) datos.get("tourId")).intValue();
-                reserva.setTourId(tourId);
-            } else {
-                Integer paqueteId = ((Double) datos.get("paqueteId")).intValue();
-                reserva.setPaqueteId(paqueteId);
-            }
-
-            // Convertimos el texto "2026-05-15" a LocalDate
-            reserva.setFechaViaje(
-                LocalDate.parse((String) datos.get("fechaViaje")));
-
-            reserva.setPersonas(((Double) datos.get("personas")).intValue());
-            reserva.setTotal(
-                new java.math.BigDecimal(datos.get("total").toString()));
-
-            // Lista de IDs de asientos seleccionados
-            @SuppressWarnings("unchecked")
-            List<Double> asientosRaw =
-                (List<Double>) datos.get("asientosIds");
-
-            List<Integer> asientosIds = new ArrayList<>();
-            if (asientosRaw != null) {
-                for (Double id : asientosRaw) {
-                    asientosIds.add(id.intValue());
-                }
-            }
-
-            // ── Crear la reserva en la BD ──────────────────
-            // Este método usa una transacción — inserta la reserva
-            // y confirma los asientos en una sola operación
-            Integer reservaId = reservaDAO.crearReservaCompleta(
-                reserva, asientosIds);
-
-            if (reservaId == -1) {
-                // Falló — probablemente un asiento ya no estaba disponible
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
-                out.print(gson.toJson(
-                    crearError("No se pudo completar la reserva. " +
-                               "Algún asiento ya no está disponible.")));
-                return;
-            }
-
-            // Reserva creada exitosamente
-            response.setStatus(HttpServletResponse.SC_CREATED);
-            Map<String, Object> respuesta = new HashMap<>();
-            respuesta.put("error",     false);
-            respuesta.put("mensaje",   "Reserva creada exitosamente");
-            respuesta.put("reservaId", reservaId);
-            out.print(gson.toJson(respuesta));
-
-        } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.print(gson.toJson(crearError("Error: " + e.getMessage())));
+                           HttpServletResponse response,
+                           PrintWriter out) throws IOException {
+    try {
+        StringBuilder sb = new StringBuilder();
+        String linea;
+        while ((linea = request.getReader().readLine()) != null) {
+            sb.append(linea);
         }
-    }
 
+        HttpSession sesion    = request.getSession(false);
+        Integer usuarioId     = (Integer) sesion.getAttribute("usuarioId");
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> datos = gson.fromJson(
+            sb.toString(), Map.class);
+
+        // Construir el objeto Reserva con los datos recibidos
+        Reserva reserva = new Reserva();
+        reserva.setUsuarioId(usuarioId);
+        reserva.setTipoServicio((String) datos.get("tipoServicio"));
+        reserva.setFechaViaje(
+            java.time.LocalDate.parse(
+                (String) datos.get("fechaViaje")));
+        reserva.setPersonas(
+            ((Double) datos.get("personas")).intValue());
+        reserva.setTotal(
+            new java.math.BigDecimal(
+                datos.get("total").toString()));
+        reserva.setEstado("PENDIENTE");
+
+        // Asignar tour o paquete segun el tipo
+        if ("TOUR".equals(reserva.getTipoServicio())) {
+            reserva.setTourId(
+                ((Double) datos.get("tourId")).intValue());
+        } else {
+            reserva.setPaqueteId(
+                ((Double) datos.get("paqueteId")).intValue());
+        }
+        
+        List<Integer> sinAsientos = new ArrayList<>();
+        // Guardar en la BD y obtener el ID generado
+        Integer reservaId = reservaDAO.crearReservaCompleta(reserva, sinAsientos);
+
+        
+        
+        if (reservaId != null && reservaId > 0) {
+            Map<String, Object> resp = new HashMap<>();
+            resp.put("error",     false);
+            resp.put("mensaje",   "Reserva creada correctamente");
+            resp.put("reservaId", reservaId);
+            response.setStatus(HttpServletResponse.SC_CREATED);
+            out.print(gson.toJson(resp));
+        } else {
+            response.setStatus(
+                HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.print(gson.toJson(
+                crearError("No se pudo crear la reserva")));
+        }
+
+    } catch (Exception e) {
+        response.setStatus(
+            HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        out.print(gson.toJson(
+            crearError("Error: " + e.getMessage())));
+    }
+}
+
+    
+    
+    
     /**
      * manejarCancelar()
      *

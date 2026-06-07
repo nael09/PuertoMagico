@@ -1,6 +1,7 @@
 package com.puertomagico.servlet;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.puertomagico.dao.AsientoDAO;
 import com.puertomagico.modelo.Asiento;
 import java.io.IOException;
@@ -14,7 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.annotation.WebServlet;
-/**
+
+  /*
  * AsientoServlet.java
  *
  * Maneja las peticiones relacionadas con asientos de un tour.
@@ -33,11 +35,34 @@ public class AsientoServlet extends HttpServlet {
     private AsientoDAO asientoDAO;
     private Gson gson;
 
-    @Override
-    public void init() throws ServletException {
-        asientoDAO = new AsientoDAO();
-        gson       = new Gson();
-    }
+@Override
+public void init() throws ServletException {
+    asientoDAO = new AsientoDAO();
+
+    /*
+     * GsonBuilder con serializadores personalizados para
+     * LocalDateTime y LocalDate — sin esto Gson lanza error
+     * al intentar convertir esos tipos a JSON porque no son
+     * tipos nativos que Gson reconozca por defecto.
+     */
+    GsonBuilder builder = new GsonBuilder();
+
+    builder.registerTypeAdapter(
+        java.time.LocalDateTime.class,
+        (com.google.gson.JsonSerializer<java.time.LocalDateTime>)
+        (src, type, ctx) -> ctx.serialize(
+            src.format(java.time.format.DateTimeFormatter
+                .ISO_LOCAL_DATE_TIME)));
+
+    builder.registerTypeAdapter(
+        java.time.LocalDate.class,
+        (com.google.gson.JsonSerializer<java.time.LocalDate>)
+        (src, type, ctx) -> ctx.serialize(
+            src.format(java.time.format.DateTimeFormatter
+                .ISO_LOCAL_DATE)));
+
+    gson = builder.create();
+}
 
     /**
      * doGet()
@@ -64,7 +89,7 @@ public class AsientoServlet extends HttpServlet {
         }
 
         try {
-            Integer tourId          = Integer.parseInt(paramTourId);
+            Integer tourId = Integer.parseInt(paramTourId);
             List<Asiento> asientos  = asientoDAO.listarPorTour(tourId);
             out.print(gson.toJson(asientos));
 

@@ -55,6 +55,7 @@ public class TourDAO {
         String sql = "SELECT t.id, t.destino_id, t.vehiculo_id, " +
                      "t.nombre, t.descripcion, t.duracion_horas, " +
                      "t.precio_base, t.cupo_maximo, t.dificultad, t.activo, " +
+                     "t.fecha_salida, t.puntos_salida, " +
                      "d.nombre AS nombre_destino, " +
                      "v.descripcion AS nombre_vehiculo " +
                      "FROM tours t " +
@@ -145,6 +146,7 @@ public class TourDAO {
         String sql = "SELECT t.id, t.destino_id, t.vehiculo_id, " +
                      "t.nombre, t.descripcion, t.duracion_horas, " +
                      "t.precio_base, t.cupo_maximo, t.dificultad, t.activo, " +
+                     "t.fecha_salida, t.puntos_salida, " +
                      "d.nombre AS nombre_destino, " +
                      "v.descripcion AS nombre_vehiculo " +
                      "FROM tours t " +
@@ -208,6 +210,7 @@ public class TourDAO {
         String sql = "SELECT t.id, t.destino_id, t.vehiculo_id, " +
                      "t.nombre, t.descripcion, t.duracion_horas, " +
                      "t.precio_base, t.cupo_maximo, t.dificultad, t.activo, " +
+                     "t.fecha_salida, t.puntos_salida, " +
                      "d.nombre AS nombre_destino, " +
                      "v.descripcion AS nombre_vehiculo " +
                      "FROM tours t " +
