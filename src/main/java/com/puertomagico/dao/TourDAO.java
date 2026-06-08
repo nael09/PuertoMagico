@@ -107,7 +107,14 @@ public class TourDAO {
                 // Datos del JOIN — nombre del destino y vehículo
                 tour.setNombreDestino(rs.getString("nombre_destino"));
                 tour.setNombreVehiculo(rs.getString("nombre_vehiculo"));
-
+                
+                
+                
+                tour.setFechaSalida(rs.getString("fecha_salida"));
+                tour.setPuntosSalida(rs.getString("puntos_salida"));
+                
+                
+             
                 // Agregamos el tour a la lista
                 tours.add(tour);
             }
@@ -180,6 +187,8 @@ public class TourDAO {
                 tour.setActivo(rs.getBoolean("activo"));
                 tour.setNombreDestino(rs.getString("nombre_destino"));
                 tour.setNombreVehiculo(rs.getString("nombre_vehiculo"));
+                tour.setFechaSalida(rs.getString("fecha_salida"));
+                tour.setPuntosSalida(rs.getString("puntos_salida"));
             }
 
         } catch (SQLException e) {
@@ -239,6 +248,10 @@ public class TourDAO {
                 tour.setActivo(rs.getBoolean("activo"));
                 tour.setNombreDestino(rs.getString("nombre_destino"));
                 tour.setNombreVehiculo(rs.getString("nombre_vehiculo"));
+                tour.setFechaSalida(rs.getString("fecha_salida"));
+                tour.setPuntosSalida(rs.getString("puntos_salida"));
+                
+                
                 tours.add(tour);
             }
 
@@ -265,12 +278,11 @@ public class TourDAO {
 
         Connection conexion = null;
 
-        // INSERT con ? para cada valor — nunca concatenes datos del usuario
-        String sql = "INSERT INTO tours (destino_id, vehiculo_id, nombre, " +
-                     "descripcion, duracion_horas, precio_base, " +
-                     "cupo_maximo, dificultad, activo) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
+         // Incluimos fecha_salida y puntos_salida en el INSERT
+    String sql = "INSERT INTO tours (destino_id, vehiculo_id, nombre, " +
+                 "descripcion, duracion_horas, precio_base, cupo_maximo, " +
+                 "dificultad, activo, fecha_salida, puntos_salida) " +
+                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, true, ?, ?)";
         try {
             conexion = ConexionDB.getConexion();
             PreparedStatement stmt = conexion.prepareStatement(sql);
@@ -284,14 +296,19 @@ public class TourDAO {
             stmt.setBigDecimal(6, tour.getPrecioBase()); // sexto ?
             stmt.setInt(7, tour.getCupoMaximo());      // séptimo ?
             stmt.setString(8, tour.getDificultad());   // octavo ?
-            stmt.setBoolean(9, true);                  // noveno ? (activo)
+                           // noveno ? (activo)
 
-            // executeUpdate() ejecuta INSERT, UPDATE o DELETE
-            // Devuelve el número de filas afectadas
-            int filasAfectadas = stmt.executeUpdate();
+            if (tour.getFechaSalida() != null &&
+            !tour.getFechaSalida().isEmpty()) {
+            stmt.setDate(9, java.sql.Date.valueOf(
+                tour.getFechaSalida()));
+        } else {
+            stmt.setNull(9, java.sql.Types.DATE);
+        }
 
-            // Si insertó al menos 1 fila, fue exitoso
-            return filasAfectadas > 0;
+        stmt.setString(10, tour.getPuntosSalida());
+
+        return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
             System.err.println("Error al insertar tour: " + e.getMessage());
@@ -310,41 +327,52 @@ public class TourDAO {
      * @param tour — objeto Tour con los datos actualizados
      * @return true si se actualizó correctamente, false si hubo error
      */
-    public boolean actualizar(Tour tour) {
+public boolean actualizar(Tour tour) {
 
-        Connection conexion = null;
+    Connection conexion = null;
 
-        String sql = "UPDATE tours SET destino_id = ?, vehiculo_id = ?, " +
-                     "nombre = ?, descripcion = ?, duracion_horas = ?, " +
-                     "precio_base = ?, cupo_maximo = ?, dificultad = ? " +
-                     "WHERE id = ?";
+    // Incluimos fecha_salida y puntos_salida en el UPDATE
+    String sql = "UPDATE tours SET destino_id = ?, vehiculo_id = ?, " +
+                 "nombre = ?, descripcion = ?, duracion_horas = ?, " +
+                 "precio_base = ?, cupo_maximo = ?, dificultad = ?, " +
+                 "fecha_salida = ?, puntos_salida = ? " +
+                 "WHERE id = ?";
 
-        try {
-            conexion = ConexionDB.getConexion();
-            PreparedStatement stmt = conexion.prepareStatement(sql);
+    try {
+        conexion = ConexionDB.getConexion();
+        PreparedStatement stmt = conexion.prepareStatement(sql);
 
-            stmt.setInt(1, tour.getDestinoId());
-            stmt.setInt(2, tour.getVehiculoId());
-            stmt.setString(3, tour.getNombre());
-            stmt.setString(4, tour.getDescripcion());
-            stmt.setInt(5, tour.getDuracionHoras());
-            stmt.setBigDecimal(6, tour.getPrecioBase());
-            stmt.setInt(7, tour.getCupoMaximo());
-            stmt.setString(8, tour.getDificultad());
-            // El ID va al final porque es el WHERE — el último ?
-            stmt.setInt(9, tour.getId());
+        stmt.setInt(1,    tour.getDestinoId());
+        stmt.setInt(2,    tour.getVehiculoId());
+        stmt.setString(3, tour.getNombre());
+        stmt.setString(4, tour.getDescripcion());
+        stmt.setInt(5,    tour.getDuracionHoras());
+        stmt.setBigDecimal(6, tour.getPrecioBase());
+        stmt.setInt(7,    tour.getCupoMaximo());
+        stmt.setString(8, tour.getDificultad());
 
-            int filasAfectadas = stmt.executeUpdate();
-            return filasAfectadas > 0;
-
-        } catch (SQLException e) {
-            System.err.println("Error al actualizar tour: " + e.getMessage());
-            return false;
-        } finally {
-            ConexionDB.cerrarConexion(conexion);
+        if (tour.getFechaSalida() != null &&
+            !tour.getFechaSalida().isEmpty()) {
+            stmt.setDate(9, java.sql.Date.valueOf(
+                tour.getFechaSalida()));
+        } else {
+            stmt.setNull(9, java.sql.Types.DATE);
         }
-    }
 
+        stmt.setString(10, tour.getPuntosSalida());
+        // El ID va al final — es el WHERE
+        stmt.setInt(11, tour.getId());
+
+        return stmt.executeUpdate() > 0;
+
+    } catch (SQLException e) {
+        System.err.println("Error al actualizar tour: "
+            + e.getMessage());
+        return false;
+    } finally {
+        ConexionDB.cerrarConexion(conexion);
+    }
+}
     /**
      * desactivar()
      * 

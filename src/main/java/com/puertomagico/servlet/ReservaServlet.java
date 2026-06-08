@@ -362,12 +362,14 @@ public class ReservaServlet extends HttpServlet {
                 out.print(gson.toJson(
                     crearExito("Reserva cancelada correctamente")));
             } else {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.setStatus(
+                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 out.print(gson.toJson(crearError("No se pudo cancelar")));
             }
 
         } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setStatus(
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.print(gson.toJson(crearError("Error: " + e.getMessage())));
         }
     }

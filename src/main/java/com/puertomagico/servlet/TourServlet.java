@@ -1,7 +1,6 @@
 package com.puertomagico.servlet;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSerializer;
 import com.puertomagico.dao.AsientoDAO;
 import com.puertomagico.dao.TourDAO;
@@ -20,6 +19,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.google.gson.GsonBuilder;
+
 
 /**
  
@@ -57,35 +59,29 @@ public class TourServlet extends HttpServlet {
      * 
      * Es más eficiente que crear un DAO nuevo en cada petición.
      */
-    @Override
-    public void init() throws ServletException {
-        tourDAO = new TourDAO();
-        asientoDAO = new AsientoDAO();
+   @Override
+public void init() throws ServletException {
+    tourDAO    = new TourDAO();
+    asientoDAO = new AsientoDAO(); // ← faltaba esta línea
 
-        // Configuramos Gson para manejar tipos especiales de Java
-        // que Gson no sabe convertir por defecto
-        GsonBuilder builder = new GsonBuilder();
+    GsonBuilder builder = new GsonBuilder();
 
-        // Serializador para BigDecimal → número con 2 decimales
-        // Sin esto Gson lo convierte a notación científica: 8.5E+2
-        builder.registerTypeAdapter(BigDecimal.class,
-            (JsonSerializer<BigDecimal>) (src, typeOfSrc, context) ->
-                context.serialize(src.doubleValue()));
+    builder.registerTypeAdapter(
+        java.time.LocalDate.class,
+        (com.google.gson.JsonSerializer<java.time.LocalDate>)
+        (src, type, ctx) -> ctx.serialize(
+            src.format(java.time.format.DateTimeFormatter
+                .ISO_LOCAL_DATE)));
 
-        // Serializador para LocalDateTime → texto "2026-03-25T14:30:00"
-        builder.registerTypeAdapter(LocalDateTime.class,
-            (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context) ->
-                context.serialize(src.format(
-                    DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+    builder.registerTypeAdapter(
+        java.time.LocalDateTime.class,
+        (com.google.gson.JsonSerializer<java.time.LocalDateTime>)
+        (src, type, ctx) -> ctx.serialize(
+            src.format(java.time.format.DateTimeFormatter
+                .ISO_LOCAL_DATE_TIME)));
 
-        // Serializador para LocalDate → texto "2026-03-25"
-        builder.registerTypeAdapter(LocalDate.class,
-            (JsonSerializer<LocalDate>) (src, typeOfSrc, context) ->
-                context.serialize(src.format(
-                    DateTimeFormatter.ISO_LOCAL_DATE)));
-
-        gson = builder.create();
-    }
+    gson = builder.create();
+}
 
     /**
      * doGet()

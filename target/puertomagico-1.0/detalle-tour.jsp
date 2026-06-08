@@ -312,14 +312,16 @@
                                 <label class="form-label fw-semibold small">
                                     Fecha del tour
                                 </label>
-                                <input type="date"
-                                       class="form-control bg-light"
-                                       id="fecha-tour"
-                                       readonly>
-                                <div class="form-text">
-                                    <i class="bi bi-info-circle me-1"></i>
-                                    Fecha establecida por la agencia
+                                
+                                
+                                <div class="alert alert-warning py-2 mb-o"
+                                     id="fecha-display">
+                                    <i class ="bi bi-calendar-event me-1"></i>
+                                    <strong id="fecha-texto">cargando fecha..</strong>
                                 </div>
+                                
+                                <input type="hidden" id="fecha-tour"> 
+                             
                             </div>
 
                             <!-- Puntos de salida -->
@@ -576,7 +578,18 @@
             if (tour.fechaSalida) {
                 document.getElementById('fecha-tour').value =
                     tour.fechaSalida;
-                cargarMapa();
+                
+                
+                var partes = tour.fechaSalida.split('-');
+                var fechaBonita = partes[2] + '/' +
+                                  partes[1] + '/' +  partes[0];
+                             
+                          document.getElementById('fecha-texto')
+                                  .textContent = fechaBonita;
+                          cargarMapa();
+            }else{
+                document.getElementById('fecha-texto')
+                        .textContent = 'Fecha por Confirmar';
             }
 
             // Puntos de salida

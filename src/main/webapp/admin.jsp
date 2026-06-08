@@ -197,6 +197,8 @@
                                         <th>#</th>
                                         <th>Nombre</th>
                                         <th>Destino</th>
+                                        <th>Fecha salida</th>
+                                        <th>Salidas desde</th>
                                         <th>Precio</th>
                                         <th>Horas</th>
                                         <th>Dificultad</th>
@@ -551,6 +553,20 @@
                         '<td>' + t.id + '</td>' +
                         '<td class="fw-semibold">' + t.nombre + '</td>' +
                         '<td>' + (t.nombreDestino || '-') + '</td>' +
+                        
+                        
+                        // Fecha de salida formateada
+                        '<td>' +
+                        (t.fechaSalida
+                           ? '<span class="badge bg-info text-dark">' +
+                            t.fechaSalida + '</span>'
+                          : '<span class="badge bg-secondary">Sin fecha</span>') +
+                      '</td>' +
+
+                        // Puntos de salida
+                        '<td><small class="text-muted">' +
+                        (t.puntosSalida || '-') + '</small></td>' +
+                      
                         '<td>$' + Number(t.precioBase)
                             .toLocaleString('es-MX') + '</td>' +
                         '<td>' + t.duracionHoras + ' hrs</td>' +
