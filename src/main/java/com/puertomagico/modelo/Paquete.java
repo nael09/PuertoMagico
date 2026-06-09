@@ -13,6 +13,8 @@ public class Paquete {
     private Integer cupoMaximo;
     private String categoria;
     private Boolean activo;
+    
+    private String fechaInicio;
 
     public Paquete() {
     }
@@ -107,6 +109,13 @@ public class Paquete {
 
     public void setActivo(Boolean activo) {
         this.activo = activo;
+    }
+    
+    public String getFechaInicio(){ 
+        return fechaInicio;
+    }
+    public void  setFechaInicio(String f) {
+        this.fechaInicio = f;
     }
 
     @Override

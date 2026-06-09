@@ -13,6 +13,7 @@ com\puertomagico\servlet\ReservaServlet.class
 com\puertomagico\dao\PagoDAO.class
 com\puertomagico\modelo\Reserva.class
 com\puertomagico\modelo\ParadaTour.class
+com\puertomagico\servlet\VehiculoServlet.class
 com\puertomagico\dao\ResenaDAO.class
 com\puertomagico\dao\TourDAO.class
 com\puertomagico\conexion\ConexionDB.class

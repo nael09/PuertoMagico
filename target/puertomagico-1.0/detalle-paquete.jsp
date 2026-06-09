@@ -1,4 +1,6 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" 
+         language="java" 
+         isELIgnored="true" %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -13,7 +15,7 @@
             --naranja-dark: #D48A10;
             --azul: #2E86AB;
         }
-        .navbar { border-bottom: 3px solid var(--naranja); }
+        .navbar  { border-bottom: 3px solid var(--naranja); }
         .btn-naranja {
             background-color: var(--naranja);
             border-color: var(--naranja);
@@ -24,7 +26,6 @@
             background-color: var(--naranja-dark);
             color: #fff;
         }
-        /* Banner superior del paquete */
         .paquete-banner {
             height: 200px;
             border-radius: 12px;
@@ -33,7 +34,6 @@
             justify-content: center;
             background-color: #e8f4f9;
         }
-        /* Caja de reserva fija al hacer scroll */
         .reserva-box { position: sticky; top: 80px; }
         .precio-grande {
             font-size: 2rem;
@@ -44,7 +44,7 @@
 </head>
 <body class="bg-light">
 
-    <!-- NAVBAR -->
+    <%-- NAVBAR --%>
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
             <a class="navbar-brand fw-bold" href="index.jsp">
@@ -70,7 +70,7 @@
         </div>
     </nav>
 
-    <!-- MIGA DE PAN -->
+    <%-- MIGA DE PAN --%>
     <div class="bg-white border-bottom py-2">
         <div class="container">
             <nav aria-label="breadcrumb">
@@ -95,17 +95,23 @@
     <div class="container py-4">
         <div class="row g-4">
 
-            <!-- COLUMNA IZQUIERDA: Detalle del paquete -->
+            <%-- COLUMNA IZQUIERDA --%>
             <div class="col-lg-8">
 
-                <!-- Banner -->
-                <div class="paquete-banner mb-4"
-                     id="paquete-banner">
+                <%-- Boton regresar --%>
+                <a href="paquetes.jsp"
+                   class="btn btn-outline-secondary btn-sm mb-4">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    Regresar a Paquetes
+                </a>
+
+                <%-- Banner --%>
+                <div class="paquete-banner mb-4" id="paquete-banner">
                     <i class="bi bi-bag-heart"
                        style="font-size:4rem;color:var(--azul)"></i>
                 </div>
 
-                <!-- Titulo y categoria -->
+                <%-- Titulo y categoria --%>
                 <div class="mb-4">
                     <div class="mb-2" id="paquete-badge"></div>
                     <h2 class="fw-bold" id="paquete-nombre">
@@ -114,10 +120,10 @@
                     <p class="text-muted" id="paquete-categoria"></p>
                 </div>
 
-                <!-- Datos rapidos -->
+                <%-- Datos rapidos --%>
                 <div class="row g-3 mb-4" id="paquete-datos"></div>
 
-                <!-- Descripcion -->
+                <%-- Descripcion --%>
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-body">
                         <h5 class="fw-bold mb-3">Descripcion</h5>
@@ -128,7 +134,18 @@
                     </div>
                 </div>
 
-                <!-- Que incluye -->
+                <%-- Duracion con fechas --%>
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-3">Duracion</h5>
+                        <p class="text-muted mb-0"
+                           id="paquete-duracion">
+                            Cargando...
+                        </p>
+                    </div>
+                </div>
+
+                <%-- Que incluye --%>
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-body">
                         <h5 class="fw-bold mb-3">Que incluye</h5>
@@ -173,7 +190,7 @@
                     </div>
                 </div>
 
-                <!-- Tours del itinerario -->
+                <%-- Itinerario --%>
                 <div class="card border-0 shadow-sm">
                     <div class="card-body">
                         <h5 class="fw-bold mb-3">
@@ -188,47 +205,55 @@
                 </div>
             </div>
 
-            <!-- COLUMNA DERECHA: Caja de reserva -->
+            <%-- COLUMNA DERECHA: Caja de reserva --%>
             <div class="col-lg-4">
                 <div class="reserva-box">
                     <div class="card border-0 shadow-sm">
                         <div class="card-body p-4">
 
-                            <!-- Precio -->
+                            <%-- Precio --%>
                             <div class="precio-grande mb-1"
                                  id="reserva-precio">$---</div>
                             <p class="text-muted small mb-3">
                                 por persona — todo incluido
                             </p>
 
-                            <!-- Duracion -->
-                            <div class="alert alert-info py-2
-                                        small mb-3"
-                                 id="paquete-duracion">
-                                <i class="bi bi-calendar3 me-1"></i>
-                                Cargando...
-                            </div>
-
-                            <!-- Disponibilidad -->
-                            <div class="alert alert-success py-2
-                                        small mb-3"
-                                 id="disponibilidad">
-                                <i class="bi bi-check-circle me-1"></i>
-                                Verificando disponibilidad...
-                            </div>
-
-                            <!-- Fecha de inicio -->
+                            <%-- 
+                                Fecha de inicio establecida por la agencia.
+                                Se muestra como badge informativo.
+                                El campo oculto guarda el valor para la reserva.
+                            --%>
                             <div class="mb-3">
                                 <label class="form-label
                                               fw-semibold small">
                                     Fecha de inicio
                                 </label>
-                                <input type="date"
-                                       class="form-control"
-                                       id="fecha-inicio">
+                                <div class="alert alert-warning
+                                            py-2 mb-1">
+                                    <i class="bi bi-calendar-event
+                                              me-1"></i>
+                                    <strong id="fecha-texto">
+                                        Cargando...
+                                    </strong>
+                                </div>
+                                <%-- Campo oculto para enviar la fecha
+                                     al servidor al crear la reserva --%>
+                                <input type="hidden" id="fecha-inicio">
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Fecha establecida por la agencia
+                                </div>
                             </div>
 
-                            <!-- Personas -->
+                            <%-- Disponibilidad de cupos --%>
+                            <div class="alert alert-success py-2
+                                        small mb-3"
+                                 id="disponibilidad">
+                                <i class="bi bi-people me-1"></i>
+                                Verificando disponibilidad...
+                            </div>
+
+                            <%-- Numero de personas --%>
                             <div class="mb-3">
                                 <label class="form-label
                                               fw-semibold small">
@@ -247,7 +272,7 @@
                                 </select>
                             </div>
 
-                            <!-- Resumen de precio -->
+                            <%-- Resumen de precio --%>
                             <div class="bg-light rounded p-3 mb-3">
                                 <div class="d-flex
                                             justify-content-between
@@ -302,15 +327,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const BASE = '/PuertoMagico';
-
-        // Leemos el ID del paquete desde la URL: ?id=1
-        const id = new URLSearchParams(
+        const id   = new URLSearchParams(
             window.location.search).get('id');
+        var precioBase = 0;
 
-        // Guardamos el precio para calcular el total
-        let precioBase = 0;
-
-        window.onload = function () {
+        window.onload = function() {
             verificarSesion();
             if (id) cargarPaquete(id);
             else {
@@ -319,59 +340,61 @@
             }
         };
 
-        async function verificarSesion() {
-            try {
-                const res  = await fetch(BASE + '/api/usuarios/sesion');
-                const data = await res.json();
-                if (!data.error) {
-                    document.getElementById('nav-sesion')
-                        .classList.add('d-none');
-                    document.getElementById('nav-usuario')
-                        .classList.remove('d-none');
-                    document.getElementById('nav-nombre')
-                        .textContent = data.nombre;
-                }
-            } catch (e) {}
+        // ── SESION ─────────────────────────────────────
+
+        function verificarSesion() {
+            fetch(BASE + '/api/usuarios/sesion')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (!data.error) {
+                        document.getElementById('nav-sesion')
+                            .classList.add('d-none');
+                        document.getElementById('nav-usuario')
+                            .classList.remove('d-none');
+                        document.getElementById('nav-nombre')
+                            .textContent = data.nombre;
+                    }
+                })
+                .catch(function() {});
         }
 
-        async function cerrarSesion() {
-            await fetch(BASE + '/api/usuarios/logout');
-            window.location.reload();
+        function cerrarSesion() {
+            fetch(BASE + '/api/usuarios/logout')
+                .then(function() { window.location.reload(); });
         }
+
+        // ── PAQUETE ────────────────────────────────────
 
         /**
          * cargarPaquete()
          * Hace GET al PaqueteServlet con el ID del paquete
          * y llena todos los datos en la pagina.
          */
-        async function cargarPaquete(paqueteId) {
-            try {
-                const res  = await fetch(
-                    BASE + '/api/paquetes?id=' + paqueteId);
-                const data = await res.json();
-
-                if (!data || data.error) {
-                    alert('Paquete no encontrado.');
-                    window.location.href = 'paquetes.jsp';
-                    return;
-                }
-
-                llenarDatos(data);
-
-            } catch (e) {
-                alert('Error al cargar el paquete.');
-            }
+        function cargarPaquete(paqueteId) {
+            fetch(BASE + '/api/paquetes?id=' + paqueteId)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (!data || data.error) {
+                        alert('Paquete no encontrado.');
+                        window.location.href = 'paquetes.jsp';
+                        return;
+                    }
+                    llenarDatos(data);
+                })
+                .catch(function() {
+                    alert('Error al cargar el paquete.');
+                });
         }
 
         /**
          * llenarDatos()
          * Llena todos los elementos HTML con los datos
-         * del paquete que vino del servidor.
+         * del paquete. Usa concatenacion de strings en lugar
+         * de template literals para evitar conflicto con JSP.
          */
         function llenarDatos(p) {
             document.title = p.nombre + ' - Puerto Magico';
 
-            // Miga de pan y titulo
             document.getElementById('breadcrumb-paquete')
                 .textContent = p.nombre;
             document.getElementById('paquete-nombre')
@@ -381,87 +404,119 @@
             document.getElementById('paquete-descripcion')
                 .textContent = p.descripcion || 'Sin descripcion.';
 
-            // Colores segun categoria
-            const colores = {
+            // Colores segun categoria del paquete
+            var colores = {
                 'PLAYA':    { bg: '#E8F4F9', color: '#2E86AB' },
                 'CULTURAL': { bg: '#FFF3E0', color: '#F5A623' },
                 'AVENTURA': { bg: '#E8F5E9', color: '#2E7D32' },
                 'ECO':      { bg: '#F1F8E9', color: '#558B2F' },
                 'CIUDAD':   { bg: '#F3E5F5', color: '#7B1FA2' }
             };
-            const estilo = colores[p.categoria] ||
+            var estilo = colores[p.categoria] ||
                 { bg: '#F5F5F5', color: '#666' };
 
-            // Banner con color de categoria
             document.getElementById('paquete-banner')
                 .style.backgroundColor = estilo.bg;
 
             // Badge de categoria
             document.getElementById('paquete-badge').innerHTML =
-                `<span class="badge rounded-pill text-white"
-                       style="background-color:${estilo.color}">
-                    ${p.categoria || 'GENERAL'}
-                 </span>`;
+                '<span class="badge rounded-pill text-white"' +
+                ' style="background-color:' + estilo.color + '">' +
+                (p.categoria || 'GENERAL') + '</span>';
 
-            // Duracion
-            const noches = (p.duracionDias || 1) - 1;
-            document.getElementById('paquete-duracion').innerHTML =
-                `<i class="bi bi-calendar3 me-1"></i>
-                 ${p.duracionDias} dias / ${noches} noches`;
+            // Fecha de inicio
+            var noches = (p.duracionDias || 1) - 1;
+            if (p.fechaInicio) {
+                // Guardar en campo oculto para la reserva
+                document.getElementById('fecha-inicio').value =
+                    p.fechaInicio;
+
+                // Formatear: "2026-07-14" → "14/07/2026"
+                var partes      = p.fechaInicio.split('-');
+                var fechaInicio = partes[2] + '/' +
+                                  partes[1] + '/' + partes[0];
+
+                // Calcular fecha de fin
+                var fechaFinObj = new Date(
+                    p.fechaInicio + 'T00:00:00');
+                fechaFinObj.setDate(
+                    fechaFinObj.getDate() + (p.duracionDias - 1));
+                var fechaFin = fechaFinObj.toLocaleDateString(
+                    'es-MX', {
+                        day:   '2-digit',
+                        month: '2-digit',
+                        year:  'numeric'
+                    });
+
+                document.getElementById('fecha-texto')
+                    .textContent = fechaInicio + ' al ' + fechaFin;
+
+                document.getElementById('paquete-duracion')
+                    .innerHTML =
+                    '<i class="bi bi-calendar3 me-1"></i>' +
+                    p.duracionDias + ' dias / ' + noches +
+                    ' noches — Del ' + fechaInicio +
+                    ' al ' + fechaFin;
+            } else {
+                document.getElementById('fecha-texto')
+                    .textContent = 'Fecha por confirmar';
+                document.getElementById('paquete-duracion')
+                    .innerHTML =
+                    '<i class="bi bi-calendar3 me-1"></i>' +
+                    p.duracionDias + ' dias / ' + noches + ' noches';
+            }
 
             // Datos rapidos en tarjetas
-            document.getElementById('paquete-datos').innerHTML = `
-                <div class="col-6 col-md-3">
-                    <div class="card border-0 bg-white
-                                shadow-sm text-center p-3">
-                        <i class="bi bi-calendar3 fs-4
-                                  text-primary mb-1"></i>
-                        <div class="fw-bold">${p.duracionDias} dias</div>
-                        <small class="text-muted">Duracion</small>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="card border-0 bg-white
-                                shadow-sm text-center p-3">
-                        <i class="bi bi-moon fs-4
-                                  text-primary mb-1"></i>
-                        <div class="fw-bold">${noches} noches</div>
-                        <small class="text-muted">Hospedaje</small>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="card border-0 bg-white
-                                shadow-sm text-center p-3">
-                        <i class="bi bi-people fs-4
-                                  text-success mb-1"></i>
-                        <div class="fw-bold">${p.cupoMaximo}</div>
-                        <small class="text-muted">Cupo max.</small>
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="card border-0 bg-white
-                                shadow-sm text-center p-3">
-                        <i class="bi bi-tag fs-4
-                                  text-warning mb-1"></i>
-                        <div class="fw-bold">${p.categoria}</div>
-                        <small class="text-muted">Categoria</small>
-                    </div>
-                </div>
-            `;
+            document.getElementById('paquete-datos').innerHTML =
+                '<div class="col-6 col-md-3">' +
+                '<div class="card border-0 bg-white' +
+                ' shadow-sm text-center p-3">' +
+                '<i class="bi bi-calendar3 fs-4' +
+                ' text-primary mb-1"></i>' +
+                '<div class="fw-bold">' +
+                p.duracionDias + ' dias</div>' +
+                '<small class="text-muted">Duracion</small>' +
+                '</div></div>' +
+                '<div class="col-6 col-md-3">' +
+                '<div class="card border-0 bg-white' +
+                ' shadow-sm text-center p-3">' +
+                '<i class="bi bi-moon fs-4' +
+                ' text-primary mb-1"></i>' +
+                '<div class="fw-bold">' + noches + ' noches</div>' +
+                '<small class="text-muted">Hospedaje</small>' +
+                '</div></div>' +
+                '<div class="col-6 col-md-3">' +
+                '<div class="card border-0 bg-white' +
+                ' shadow-sm text-center p-3">' +
+                '<i class="bi bi-people fs-4' +
+                ' text-success mb-1"></i>' +
+                '<div class="fw-bold">' + p.cupoMaximo + '</div>' +
+                '<small class="text-muted">Cupo max.</small>' +
+                '</div></div>' +
+                '<div class="col-6 col-md-3">' +
+                '<div class="card border-0 bg-white' +
+                ' shadow-sm text-center p-3">' +
+                '<i class="bi bi-tag fs-4' +
+                ' text-warning mb-1"></i>' +
+                '<div class="fw-bold">' +
+                (p.categoria || '-') + '</div>' +
+                '<small class="text-muted">Categoria</small>' +
+                '</div></div>';
 
-            // Precio en la caja de reserva
+            // Precio
             precioBase = Number(p.precioBase);
             document.getElementById('reserva-precio').textContent =
                 '$' + precioBase.toLocaleString('es-MX');
 
-            // Disponibilidad
-            const dispEl = document.getElementById('disponibilidad');
+            // Disponibilidad de cupos
+            var dispEl = document.getElementById('disponibilidad');
             if (p.cupoMaximo > 0) {
                 dispEl.className =
                     'alert alert-success py-2 small mb-3';
                 dispEl.innerHTML =
-                    '<i class="bi bi-check-circle me-1"></i>' +
-                    p.cupoMaximo + ' lugares disponibles';
+                    '<i class="bi bi-people me-1"></i>' +
+                    '<strong>' + p.cupoMaximo +
+                    ' lugares disponibles</strong>';
             } else {
                 dispEl.className =
                     'alert alert-danger py-2 small mb-3';
@@ -475,15 +530,14 @@
 
         /**
          * calcularTotal()
-         * Recalcula el precio cuando cambia el numero de personas.
-         * total = (precio x personas) + 10% de cargo por servicio
+         * Calcula subtotal + 10% de cargo por servicio.
          */
         function calcularTotal() {
-            const personas = parseInt(
+            var personas = parseInt(
                 document.getElementById('num-personas').value);
-            const subtotal = precioBase * personas;
-            const cargo    = Math.round(subtotal * 0.10);
-            const total    = subtotal + cargo;
+            var subtotal = precioBase * personas;
+            var cargo    = Math.round(subtotal * 0.10);
+            var total    = subtotal + cargo;
 
             document.getElementById('desc-precio').textContent =
                 '$' + precioBase.toLocaleString('es-MX') +
@@ -499,30 +553,57 @@
 
         /**
          * continuarReserva()
-         * Verifica sesion activa antes de proceder al pago.
-         * Si no hay sesion, redirige al login.
+         * Verifica sesion y crea la reserva del paquete.
          */
         async function continuarReserva() {
-            const fecha = document.getElementById('fecha-inicio').value;
+            var fecha    = document.getElementById(
+                'fecha-inicio').value;
+            var personas = parseInt(
+                document.getElementById('num-personas').value);
+
             if (!fecha) {
-                alert('Selecciona una fecha de inicio.');
+                alert('No hay fecha disponible para este paquete.');
                 return;
             }
 
             try {
-                const res  = await fetch(BASE + '/api/usuarios/sesion');
-                const data = await res.json();
+                var sesRes  = await fetch(
+                    BASE + '/api/usuarios/sesion');
+                var sesData = await sesRes.json();
 
-                if (data.error) {
+                if (sesData.error) {
                     alert('Debes iniciar sesion para reservar.');
                     window.location.href = 'login.jsp';
                     return;
                 }
 
-                // Aqui conectaremos con el flujo de reserva de paquetes
-                alert('Reserva de paquete en proceso.\n' +
-                      'Paquete ID: ' + id + '\n' +
-                      'Fecha: ' + fecha);
+                var subtotal = precioBase * personas;
+                var cargo    = Math.round(subtotal * 0.10);
+                var total    = subtotal + cargo;
+
+                var res = await fetch(
+                    BASE + '/api/reservas/crear', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body:    JSON.stringify({
+                        paqueteId:    parseInt(id),
+                        tipoServicio: 'PAQUETE',
+                        fechaViaje:   fecha,
+                        personas:     personas,
+                        total:        total,
+                        asientoIds:   []
+                    })
+                });
+                var data = await res.json();
+
+                if (data.error) {
+                    alert('Error: ' + data.mensaje);
+                    return;
+                }
+
+                window.location.href =
+                    'pago.jsp?reservaId=' + data.reservaId +
+                    '&total=' + total;
 
             } catch (e) {
                 alert('Error de conexion.');

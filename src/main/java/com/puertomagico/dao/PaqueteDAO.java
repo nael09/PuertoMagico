@@ -30,6 +30,7 @@ public class PaqueteDAO {
 
         String sql = "SELECT id, nombre, descripcion, duracion_dias, " +
                      "precio_base, cupo_maximo, categoria, activo " +
+                     "activo, fecha_inicio " +  
                      "FROM paquetes " +
                      "WHERE activo = true " +
                      "ORDER BY precio_base ASC";
@@ -65,6 +66,7 @@ public class PaqueteDAO {
 
         String sql = "SELECT id, nombre, descripcion, duracion_dias, " +
                      "precio_base, cupo_maximo, categoria, activo " +
+                     "activo, fecha_inicio " +  
                      "FROM paquetes " +
                      "WHERE categoria = ? AND activo = true " +
                      "ORDER BY precio_base ASC";
@@ -101,6 +103,7 @@ public class PaqueteDAO {
 
         String sql = "SELECT id, nombre, descripcion, duracion_dias, " +
                      "precio_base, cupo_maximo, categoria, activo " +
+                     "activo, fecha_inicio " + 
                      "FROM paquetes WHERE id = ?";
 
         try {
@@ -236,6 +239,7 @@ public class PaqueteDAO {
         p.setCupoMaximo(rs.getInt("cupo_maximo"));
         p.setCategoria(rs.getString("categoria"));
         p.setActivo(rs.getBoolean("activo"));
+        p.setFechaInicio(rs.getString("fecha_inicio"));
         return p;
     }
 }

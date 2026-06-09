@@ -164,6 +164,7 @@
             <a class="navbar-brand fw-bold" href="index.jsp">
                 Puerto<span style="color:var(--naranja)">Magico</span>
             </a>
+            
             <div class="d-flex gap-2" id="nav-sesion">
                 <a href="login.jsp" class="btn btn-outline-secondary btn-sm">
                     Iniciar sesion
@@ -206,11 +207,22 @@
         </div>
     </div>
 
+    
     <div class="container py-4">
         <div class="row g-4">
 
             <!-- COLUMNA IZQUIERDA -->
             <div class="col-lg-8">
+
+                <!-- Boton Regresar -->
+              <a href="tours.jsp"
+                class="btn btn-outline-secondary btn-sm me -2">
+                <i class="bi bi arrow-left me-1"></i>
+                Regresar a Tours
+              </a>
+                
+                <!-- Separador -->
+               <div class="mb-4"></div>
 
                 <div class="tour-banner mb-4">
                     <i class="bi bi-map"
@@ -870,108 +882,82 @@
 
         // ── RESERVA ────────────────────────────────────
 
-        async function continuarReserva() {
-            var fecha    =
-                document.getElementById('fecha-tour').value;
-            var personas = parseInt(
-                document.getElementById('num-personas').value);
+async function continuarReserva() {
+    var fecha    = document.getElementById('fecha-tour').value;
+    var personas = parseInt(
+        document.getElementById('num-personas').value);
 
-            if (!fecha) {
-                alert('No hay fecha disponible para este tour.');
+    if (!fecha) {
+        alert('No hay fecha disponible para este tour.');
+        return;
+    }
+
+    if (todosLosAsientos.length > 0 &&
+        asientosSeleccionados.length < personas) {
+        alert('Selecciona ' + personas + ' asiento' +
+            (personas > 1 ? 's' : '') + ' para continuar.');
+        return;
+    }
+
+    try {
+        var sesRes  = await fetch(BASE + '/api/usuarios/sesion');
+        var sesData = await sesRes.json();
+
+        if (sesData.error) {
+            alert('Debes iniciar sesion para reservar.');
+            window.location.href = 'login.jsp';
+            return;
+        }
+
+        // Bloquear asientos temporalmente
+        for (var i = 0; i < asientosSeleccionados.length; i++) {
+            var bl = await fetch(
+                BASE + '/api/asientos/bloquear', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({
+                    asientoId: asientosSeleccionados[i].id
+                })
+            });
+            var blData = await bl.json();
+            if (blData.error) {
+                alert('El asiento ' +
+                    asientosSeleccionados[i].numero +
+                    ' ya no esta disponible.');
+                cargarMapa();
                 return;
-            }
-
-            if (todosLosAsientos.length > 0 &&
-                asientosSeleccionados.length < personas) {
-                alert('Selecciona ' + personas + ' asiento' +
-                    (personas > 1 ? 's' : '') +
-                    ' para continuar. Tienes ' +
-                    asientosSeleccionados.length +
-                    ' seleccionado' +
-                    (asientosSeleccionados.length !== 1
-                        ? 's' : '') + '.');
-                return;
-            }
-
-            try {
-                var sesRes = await fetch(
-                    BASE + '/api/usuarios/sesion');
-                var sesData = await sesRes.json();
-
-                if (sesData.error) {
-                    alert('Debes iniciar sesion para reservar.');
-                    window.location.href = 'login.jsp';
-                    return;
-                }
-
-                // Bloquear asientos seleccionados
-                for (var i = 0;
-                     i < asientosSeleccionados.length; i++) {
-                    var bl = await fetch(
-                        BASE + '/api/asientos/bloquear', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            asientoId: asientosSeleccionados[i].id
-                        })
-                    });
-                    var blData = await bl.json();
-                    if (blData.error) {
-                        alert('El asiento ' +
-                            asientosSeleccionados[i].numero +
-                            ' ya no esta disponible.' +
-                            ' Por favor elige otro.');
-                        cargarMapa();
-                        return;
-                    }
-                }
-
-                // Calcular total final
-                var extra = asientosSeleccionados.reduce(
-                    function(sum, a) {
-                        return sum + Number(a.precioExtra || 0);
-                    }, 0);
-                var subtotal = (precioBase * personas) + extra;
-                var cargo    = Math.round(subtotal * 0.10);
-                var total    = subtotal + cargo;
-
-                var asientoIds = asientosSeleccionados
-                    .map(function(a) { return a.id; });
-
-                // Crear la reserva
-                var res = await fetch(
-                    BASE + '/api/reservas/crear', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        tourId:       parseInt(id),
-                        tipoServicio: 'TOUR',
-                        fechaViaje:   fecha,
-                        personas:     personas,
-                        total:        total,
-                        asientoIds:   asientoIds
-                    })
-                });
-                var data = await res.json();
-
-                if (data.error) {
-                    alert('Error: ' + data.mensaje);
-                    return;
-                }
-
-                // Ir al pago
-                window.location.href =
-                    'pago.jsp?reservaId=' + data.reservaId +
-                    '&total=' + total;
-
-            } catch (e) {
-                alert('Error de conexion.');
             }
         }
+
+        // Calcular total
+        var extra    = asientosSeleccionados.reduce(
+            function(sum, a) {
+                return sum + Number(a.precioExtra || 0);
+            }, 0);
+        var subtotal = (precioBase * personas) + extra;
+        var cargo    = Math.round(subtotal * 0.10);
+        var total    = subtotal + cargo;
+
+        var asientoIds = asientosSeleccionados
+            .map(function(a) { return a.id; }).join(',');
+
+        /*
+         * NO creamos la reserva aqui.
+         * Solo pasamos los datos al pago via URL.
+         * La reserva se crea DESPUES del pago exitoso.
+         */
+        window.location.href =
+            'pago.jsp' +
+            '?tourId='      + id +
+            '&fecha='       + fecha +
+            '&personas='    + personas +
+            '&total='       + total +
+            '&asientoIds='  + asientoIds;
+
+    } catch (e) {
+        alert('Error de conexion.');
+    }
+}
     </script>
 </body>
 </html>

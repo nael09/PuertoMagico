@@ -29,6 +29,10 @@ public class Tour {
 
     // Ciudades desde donde sale el transporte
     private String puntosSalida;
+    
+    private String imagenUrl;
+
+
 
     /**
      * Constructor vacío — requerido por Gson.
@@ -107,6 +111,11 @@ public class Tour {
     public String getPuntosSalida()          { return puntosSalida; }
     public void   setPuntosSalida(String p)  { this.puntosSalida = p; }
 
+    
+    
+    public String getImagenUrl()           { return imagenUrl; }
+    public void   setImagenUrl(String i)   { this.imagenUrl = i; }
+    
     /**
      * toString() — útil para depuración en consola.
      */

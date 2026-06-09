@@ -321,52 +321,31 @@ public class ReservaServlet extends HttpServlet {
                 sb.toString(), Map.class);
 
             Integer reservaId = ((Double) datos.get("reservaId")).intValue();
+            
 
-            // Buscamos la reserva para validarla
-            Reserva reserva = reservaDAO.buscarPorId(reservaId);
+            // Leer el estado que manda el frontend
+            // Puede ser "CONFIRMADA" o "CANCELADA"
+            String nuevoEstado = (String) datos.get("nuevoEstado");
 
-            if (reserva == null) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                out.print(gson.toJson(crearError("Reserva no encontrada")));
-                return;
-            }
+           if (nuevoEstado == null || nuevoEstado.isEmpty()) {
+             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+             out.print(gson.toJson(crearError("Falta nuevoEstado")));
+             return;
+           }
 
-            // Verificar que la reserva le pertenezca al usuario
-            HttpSession sesion   = request.getSession(false);
-            Integer usuarioId    = (Integer) sesion.getAttribute("usuarioId");
-            String rol           = (String)  sesion.getAttribute("rol");
+           boolean exito = reservaDAO.cambiarEstado(
+            reservaId, nuevoEstado);
 
-            boolean esAdmin      = "ADMIN".equals(rol);
-            boolean esDelUsuario = reserva.getUsuarioId().equals(usuarioId);
-
-            if (!esAdmin && !esDelUsuario) {
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                out.print(gson.toJson(
-                    crearError("No puedes cancelar una reserva que no es tuya")));
-                return;
-            }
-
-            // Verificar que la reserva se pueda cancelar
-            // Solo se pueden cancelar reservas PENDIENTE o PAGADA
-            if (!reserva.isCancelable()) {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.print(gson.toJson(
-                    crearError("Esta reserva ya no se puede cancelar")));
-                return;
-            }
-
-            // Cambiar el estado a CANCELADA
-            boolean exito = reservaDAO.cambiarEstado(reservaId, "CANCELADA");
-
-            if (exito) {
-                out.print(gson.toJson(
-                    crearExito("Reserva cancelada correctamente")));
-            } else {
-                response.setStatus(
-                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                out.print(gson.toJson(crearError("No se pudo cancelar")));
-            }
-
+           if (exito) {
+            out.print(gson.toJson(crearExito(
+                "Reserva actualizada a " + nuevoEstado)));
+          } else {
+            response.setStatus(
+                HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.print(gson.toJson(
+                crearError("No se pudo actualizar la reserva")));
+        }
+   
         } catch (Exception e) {
             response.setStatus(
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

@@ -52,7 +52,7 @@ public class TourDAO {
 
         // SQL con JOIN para traer nombre de destino y vehículo
         // en lugar de solo sus IDs
-        String sql = "SELECT t.id, t.destino_id, t.vehiculo_id, " +
+        String sql = "SELECT t.imagen_url,t.id, t.destino_id, t.vehiculo_id, " +
                      "t.nombre, t.descripcion, t.duracion_horas, " +
                      "t.precio_base, t.cupo_maximo, t.dificultad, t.activo, " +
                      "t.fecha_salida, t.puntos_salida, " +
@@ -83,7 +83,10 @@ public class TourDAO {
                 // Creamos un objeto Tour y llenamos sus datos
                 // con los valores de cada columna del ResultSet
                 Tour tour = new Tour();
-
+                
+                
+                tour.setImagenUrl(rs.getString("imagen_url"));
+               
                 // rs.getInt("columna") lee un entero de esa columna
                 tour.setId(rs.getInt("id"));
                 tour.setDestinoId(rs.getInt("destino_id"));
@@ -150,7 +153,7 @@ public class TourDAO {
         // NUNCA concatenes el ID directamente en el SQL así:
         // "WHERE id = " + id  ← PELIGROSO (SQL Injection)
         // Siempre usa ? y PreparedStatement
-        String sql = "SELECT t.id, t.destino_id, t.vehiculo_id, " +
+        String sql = "SELECT t.imagen_url,t.id, t.destino_id, t.vehiculo_id, " +
                      "t.nombre, t.descripcion, t.duracion_horas, " +
                      "t.precio_base, t.cupo_maximo, t.dificultad, t.activo, " +
                      "t.fecha_salida, t.puntos_salida, " +
@@ -175,6 +178,7 @@ public class TourDAO {
             // Por eso usamos if en lugar de while
             if (rs.next()) {
                 tour = new Tour();
+                tour.setImagenUrl(rs.getString("imagen_url"));
                 tour.setId(rs.getInt("id"));
                 tour.setDestinoId(rs.getInt("destino_id"));
                 tour.setVehiculoId(rs.getInt("vehiculo_id"));
@@ -216,7 +220,7 @@ public class TourDAO {
         List<Tour> tours = new ArrayList<>();
         Connection conexion = null;
 
-        String sql = "SELECT t.id, t.destino_id, t.vehiculo_id, " +
+        String sql = "SELECT t.imagen_url,t.id, t.destino_id, t.vehiculo_id, " +
                      "t.nombre, t.descripcion, t.duracion_horas, " +
                      "t.precio_base, t.cupo_maximo, t.dificultad, t.activo, " +
                      "t.fecha_salida, t.puntos_salida, " +
@@ -236,6 +240,7 @@ public class TourDAO {
 
             while (rs.next()) {
                 Tour tour = new Tour();
+                tour.setImagenUrl(rs.getString("imagen_url"));
                 tour.setId(rs.getInt("id"));
                 tour.setDestinoId(rs.getInt("destino_id"));
                 tour.setVehiculoId(rs.getInt("vehiculo_id"));
@@ -282,6 +287,7 @@ public class TourDAO {
     String sql = "INSERT INTO tours (destino_id, vehiculo_id, nombre, " +
                  "descripcion, duracion_horas, precio_base, cupo_maximo, " +
                  "dificultad, activo, fecha_salida, puntos_salida) " +
+                  "imagen_url) " +
                  "VALUES (?, ?, ?, ?, ?, ?, ?, ?, true, ?, ?)";
         try {
             conexion = ConexionDB.getConexion();
@@ -307,6 +313,9 @@ public class TourDAO {
         }
 
         stmt.setString(10, tour.getPuntosSalida());
+        stmt.setString(11, tour.getPuntosSalida());
+        stmt.setString(12, tour.getImagenUrl());
+
 
         return stmt.executeUpdate() > 0;
 
@@ -336,12 +345,15 @@ public boolean actualizar(Tour tour) {
                  "nombre = ?, descripcion = ?, duracion_horas = ?, " +
                  "precio_base = ?, cupo_maximo = ?, dificultad = ?, " +
                  "fecha_salida = ?, puntos_salida = ? " +
+                 "imagen_url =? " +
                  "WHERE id = ?";
 
     try {
         conexion = ConexionDB.getConexion();
         PreparedStatement stmt = conexion.prepareStatement(sql);
-
+        
+        
+        
         stmt.setInt(1,    tour.getDestinoId());
         stmt.setInt(2,    tour.getVehiculoId());
         stmt.setString(3, tour.getNombre());
@@ -350,7 +362,7 @@ public boolean actualizar(Tour tour) {
         stmt.setBigDecimal(6, tour.getPrecioBase());
         stmt.setInt(7,    tour.getCupoMaximo());
         stmt.setString(8, tour.getDificultad());
-
+       
         if (tour.getFechaSalida() != null &&
             !tour.getFechaSalida().isEmpty()) {
             stmt.setDate(9, java.sql.Date.valueOf(
@@ -360,8 +372,16 @@ public boolean actualizar(Tour tour) {
         }
 
         stmt.setString(10, tour.getPuntosSalida());
+        
+        
+        
+         stmt.setString(11, tour.getImagenUrl());
+         
+         
+         
         // El ID va al final — es el WHERE
         stmt.setInt(11, tour.getId());
+       
 
         return stmt.executeUpdate() > 0;
 
